@@ -1,13 +1,15 @@
 # Geo_Mind-
 GeoMind AI
-Ask in plain English how close schools are to healthcare — anywhere with open map data — and get an answer computed with GIS and drawn on a map.
+**Ask in plain English how close schools are to healthcare — anywhere with open map data — and get an answer computed with GIS and drawn on a map**.
 
 "Which schools are more than 2 km from a medical facility?" "Which areas have poor access to healthcare?" "Which clinics are near me?"
 
 GeoMind AI turns questions like these into real spatial analysis. An AI model reads the question and picks the right analysis; Python and GeoPandas compute the answer from open map data; the map shows buffers, coverage gaps and the most underserved schools.
 
 Live app: https://geomind-ai-geomind-ai.static.hf.space
+
 API docs: https://geomind-api-fli0.onrender.com/docs
+
 The API runs on a free hosting tier that sleeps when idle — the first request after a quiet period can take up to a minute while it wakes up.
 
 Why
@@ -24,7 +26,16 @@ See a distance map of the whole area	"How far is the nearest school from each ne
 Get an area summary	"Are there enough schools in this neighbourhood?"
 Every answer shows the exact analysis that ran (for example find(target=schools, relation=beyond, distance_m=3000)), so results are traceable.
 
-How it works
+How it works flowchart LR
+   U[User in the browser] -->|question| W[web/index.html<br/>Leaflet map + chat]
+    W -->|POST /ask| A[Python API<br/>FastAPI]
+    A -->|1. route the question| G[Groq LLM<br/>gpt-oss-120b]
+    A -->|2. compute| P[GeoPandas analysis<br/>in metres UTM]
+    A -->|3. explain the facts| G
+    P --- D[(Overture Maps extract<br/>featured.json)]
+    P --- O[(OpenStreetMap<br/>Overpass + Nominatim)]
+    A -->|answer + map layers| W
+
 
 Route. The AI converts the question into one of five analysis blocks, as JSON.
 Compute. Python runs that analysis with GeoPandas — distances in metres, buffers, spatial joins, polygon overlays.
